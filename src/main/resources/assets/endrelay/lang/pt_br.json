@@ -1,5 +1,6 @@
 {
   "teleport.endrelay.no_lodestone": "Nenhuma magnetita encontrada.",
   "teleport.endrelay.obstructed": "O destino está obstruído.",
+  "block.endrelay.broken_compass": "A bussola não aponta para nenhuma magnetita.",
   "block.endrelay.end_relay": "Pedra de Retransmissão"
 }

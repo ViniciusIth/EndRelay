@@ -18,6 +18,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -71,6 +72,11 @@ public class EndRelayBlock extends Block implements BlockEntityProvider {
         if (heldItem.getItem() instanceof CompassItem) {
             if (world.isClient) {
                 return ActionResult.success(true);
+            }
+
+            if (!heldItem.getOrCreateNbt().contains(CompassItem.LODESTONE_POS_KEY)) {
+                player.sendMessage(Text.translatable("block.endrelay.broken_compass"), false);
+                return ActionResult.FAIL;
             }
 
             BlockPos teleportDestinationPos = NbtHelper.toBlockPos(

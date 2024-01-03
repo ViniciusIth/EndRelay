@@ -68,8 +68,7 @@ public class EndRelayBlockEntity extends BlockEntity {
 
     public void teleport(ServerPlayerEntity player) {
         if (!destinationHasLodestone(destination, player.getWorld())) {
-            player.networkHandler.sendPacket(new OverlayMessageS2CPacket(Text.translatable(
-                    "teleport.endrelay.no_lodestone")));
+            player.sendMessage(Text.translatable("teleport.endrelay.no_lodestone"), false);
             return;
         }
 
@@ -81,8 +80,7 @@ public class EndRelayBlockEntity extends BlockEntity {
         );
 
         if (targetPos.isEmpty()) {
-            player.networkHandler.sendPacket(new OverlayMessageS2CPacket(Text.translatable(
-                    "teleport.endrelay.obstructed")));
+            player.sendMessage(Text.translatable("teleport.endrelay.obstructed"), false);
             return;
         }
 
@@ -106,6 +104,4 @@ public class EndRelayBlockEntity extends BlockEntity {
 
         return world.getBlockState(destination).getBlock() == Blocks.LODESTONE;
     }
-
-
 }
