@@ -2,8 +2,10 @@ package cloud.viniciusith.endrelay.block;
 
 import cloud.viniciusith.endrelay.block.entity.EndRelayBlockEntity;
 import com.mojang.serialization.MapCodec;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.enums.Instrument;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
@@ -216,5 +218,18 @@ public class EndRelayBlock extends Block implements BlockEntityProvider {
             double g = (double) random.nextFloat() * 0.04;
             world.addParticle(ParticleTypes.REVERSE_PORTAL, d, e, f, 0.0, g, 0.0);
         }
+    }
+
+    public static int getLuminance(BlockState state) {
+        return state.get(CHARGED) ? 15 : 0;
+    }
+
+    public static FabricBlockSettings getBlockProperties() {
+        return FabricBlockSettings.create()
+                .mapColor(MapColor.BLACK)
+                .instrument(Instrument.BASEDRUM)
+                .requiresTool()
+                .strength(50.0F, 1200.0F)
+                .luminance(EndRelayBlock::getLuminance);
     }
 }

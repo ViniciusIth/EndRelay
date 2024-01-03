@@ -23,7 +23,7 @@ public class EndRelayMod implements ModInitializer {
     public static final String MOD_ID = "endrelay";
     public static final Logger LOGGER = Logger.getLogger(MOD_ID);
 
-    static final EndRelayBlock END_RELAY_BLOCK = new EndRelayBlock(FabricBlockSettings.copyOf(Blocks.OBSIDIAN));
+    static final EndRelayBlock END_RELAY_BLOCK = new EndRelayBlock(EndRelayBlock.getBlockProperties());
     public static final BlockEntityType<EndRelayBlockEntity> END_RELAY_BLOCK_ENTITY =
             FabricBlockEntityTypeBuilder.create(
                     EndRelayBlockEntity::new,
