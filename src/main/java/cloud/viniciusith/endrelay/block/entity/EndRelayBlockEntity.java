@@ -62,6 +62,10 @@ public class EndRelayBlockEntity extends BlockEntity {
         markDirty();
     }
 
+    public boolean hasDestination() {
+        return this.destination != null;
+    }
+
     public void teleport(ServerPlayerEntity player) {
         if (!destinationHasLodestone(destination, player.getWorld())) {
             player.networkHandler.sendPacket(new OverlayMessageS2CPacket(Text.translatable(

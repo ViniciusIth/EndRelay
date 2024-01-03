@@ -36,17 +36,15 @@ import java.util.Optional;
 
 public class EndRelayBlock extends Block implements BlockEntityProvider {
     public static final BooleanProperty CHARGED = BooleanProperty.of("charged");
-    public static final BooleanProperty HAS_TARGET = BooleanProperty.of("has_target");
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(CHARGED);
-        builder.add(HAS_TARGET);
     }
 
     public EndRelayBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.stateManager.getDefaultState().with(CHARGED, false).with(HAS_TARGET, false));
+        this.setDefaultState(this.stateManager.getDefaultState().with(CHARGED, false));
     }
 
     @Override
@@ -79,7 +77,7 @@ public class EndRelayBlock extends Block implements BlockEntityProvider {
                     heldItem.getOrCreateNbt().getCompound(CompassItem.LODESTONE_POS_KEY)
             );
 
-            setTarget(world, pos, state, blockEntity, teleportDestinationPos);
+            setTarget(blockEntity, teleportDestinationPos);
 
             return ActionResult.SUCCESS;
         }
@@ -93,7 +91,7 @@ public class EndRelayBlock extends Block implements BlockEntityProvider {
             return ActionResult.success(world.isClient);
         }
 
-        if (state.get(CHARGED) && state.get(HAS_TARGET)) {
+        if (state.get(CHARGED) && blockEntity.hasDestination()) {
             if (!world.isClient) {
                 blockEntity.teleport((ServerPlayerEntity) player);
                 uncharge(world, pos, state);
@@ -144,12 +142,9 @@ public class EndRelayBlock extends Block implements BlockEntityProvider {
         );
     }
 
-    public static void setTarget(World world, BlockPos pos, BlockState state, EndRelayBlockEntity blockEntity,
+    public static void setTarget(EndRelayBlockEntity blockEntity,
             BlockPos teleportDestinationPos) {
         blockEntity.setDestination(teleportDestinationPos);
-        BlockState blockState = state.with(HAS_TARGET, true);
-        world.setBlockState(pos, blockState, 3);
-        world.emitGameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Emitter.of(null, blockState));
     }
 
     private static boolean isChargeItem(ItemStack stack) {
