@@ -1,16 +1,17 @@
 package cloud.viniciusith.endrelay.block.entity;
 
 import cloud.viniciusith.endrelay.EndRelayMod;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -22,34 +23,29 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+import static cloud.viniciusith.endrelay.EndRelayMod.END_RELAY_BLOCK;
+
 public class EndRelayBlockEntity extends BlockEntity {
-    private BlockPos destination;
+    private BlockPos relayDestination;
 
     public EndRelayBlockEntity(BlockPos pos, BlockState state) {
         super(EndRelayMod.END_RELAY_BLOCK_ENTITY, pos, state);
     }
 
+    // NBT Serialization
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        if (this.destination == null) {
+        if (this.relayDestination == null) {
             return;
         }
-
-        nbt.put("destination", NbtHelper.fromBlockPos(this.destination));
+        nbt.put("destination", NbtHelper.fromBlockPos(this.relayDestination));
         super.writeNbt(nbt);
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
-        this.destination = NbtHelper.toBlockPos(nbt.getCompound("destination"));
-
+        this.relayDestination = NbtHelper.toBlockPos(nbt.getCompound("destination"));
         super.readNbt(nbt);
-    }
-
-    @Nullable
-    @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
     }
 
     @Override
@@ -57,26 +53,27 @@ public class EndRelayBlockEntity extends BlockEntity {
         return createNbt();
     }
 
-    public void setDestination(BlockPos destination) {
-        this.destination = destination;
+    // Set and Check Destination
+    public void setRelayDestination(BlockPos destination) {
+        this.relayDestination = destination;
         markDirty();
     }
 
-    public boolean hasDestination() {
-        return this.destination != null;
+    public boolean hasRelayDestination() {
+        return this.relayDestination != null;
     }
 
+    // Teleportation
     public void teleport(ServerPlayerEntity player) {
-        if (!destinationHasLodestone(destination, player.getWorld())) {
+        if (!destinationHasLodestone(relayDestination, player.getWorld())) {
             player.sendMessage(Text.translatable("teleport.endrelay.no_lodestone"), false);
             return;
         }
 
-
         Optional<Vec3d> targetPos = RespawnAnchorBlock.findRespawnPosition(
                 player.getType(),
                 player.getWorld(),
-                destination
+                relayDestination
         );
 
         if (targetPos.isEmpty()) {
@@ -84,6 +81,7 @@ public class EndRelayBlockEntity extends BlockEntity {
             return;
         }
 
+        World world = player.getEntityWorld();
         world.playSound(
                 null,
                 player.getX(),
@@ -97,11 +95,25 @@ public class EndRelayBlockEntity extends BlockEntity {
         player.teleport(targetPos.get().getX(), targetPos.get().getY(), targetPos.get().getZ());
     }
 
+    // Helper Method
     private boolean destinationHasLodestone(BlockPos destination, World world) {
         if (destination == null) {
             return false;
         }
-
         return world.getBlockState(destination).getBlock() == Blocks.LODESTONE;
+    }
+
+    // Packet
+    @Nullable
+    @Override
+    public Packet<ClientPlayPacketListener> toUpdatePacket() {
+        return BlockEntityUpdateS2CPacket.create(this);
+    }
+
+    public static BlockEntityType<EndRelayBlockEntity> getBlockEntityType() {
+        return FabricBlockEntityTypeBuilder.create(
+                EndRelayBlockEntity::new,
+                END_RELAY_BLOCK
+        ).build();
     }
 }

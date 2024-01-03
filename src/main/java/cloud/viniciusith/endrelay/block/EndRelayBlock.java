@@ -40,25 +40,26 @@ import java.util.Optional;
 public class EndRelayBlock extends Block implements BlockEntityProvider {
     public static final BooleanProperty CHARGED = BooleanProperty.of("charged");
 
-    @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(CHARGED);
-    }
-
     public EndRelayBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState().with(CHARGED, false));
-    }
-
-    @Override
-    protected MapCodec<? extends Block> getCodec() {
-        return null;
     }
 
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new EndRelayBlockEntity(pos, state);
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(CHARGED);
+    }
+
+
+    @Override
+    protected MapCodec<? extends Block> getCodec() {
+        return null;
     }
 
     @Override
@@ -99,7 +100,7 @@ public class EndRelayBlock extends Block implements BlockEntityProvider {
             return ActionResult.success(world.isClient);
         }
 
-        if (state.get(CHARGED) && blockEntity.hasDestination()) {
+        if (state.get(CHARGED) && blockEntity.hasRelayDestination()) {
             if (!world.isClient) {
                 blockEntity.teleport((ServerPlayerEntity) player);
                 uncharge(world, pos, state);
@@ -116,6 +117,30 @@ public class EndRelayBlock extends Block implements BlockEntityProvider {
         }
 
         return ActionResult.PASS;
+    }
+
+    @Override
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        if (state.get(CHARGED)) {
+            if (random.nextInt(100) == 0) {
+                world.playSound(
+                        null,
+                        (double) pos.getX() + 0.5,
+                        (double) pos.getY() + 0.5,
+                        (double) pos.getZ() + 0.5,
+                        SoundEvents.BLOCK_RESPAWN_ANCHOR_AMBIENT,
+                        SoundCategory.BLOCKS,
+                        1.0F,
+                        1.0F
+                );
+            }
+
+            double d = (double) pos.getX() + 0.5 + (0.5 - random.nextDouble());
+            double e = (double) pos.getY() + 1.0;
+            double f = (double) pos.getZ() + 0.5 + (0.5 - random.nextDouble());
+            double g = (double) random.nextFloat() * 0.04;
+            world.addParticle(ParticleTypes.REVERSE_PORTAL, d, e, f, 0.0, g, 0.0);
+        }
     }
 
     public static void charge(@Nullable Entity charger, World world, BlockPos pos, BlockState state) {
@@ -152,7 +177,7 @@ public class EndRelayBlock extends Block implements BlockEntityProvider {
 
     public static void setTarget(EndRelayBlockEntity blockEntity,
             BlockPos teleportDestinationPos) {
-        blockEntity.setDestination(teleportDestinationPos);
+        blockEntity.setRelayDestination(teleportDestinationPos);
     }
 
     private static boolean isChargeItem(ItemStack stack) {
@@ -194,30 +219,6 @@ public class EndRelayBlock extends Block implements BlockEntityProvider {
                 true,
                 World.ExplosionSourceType.BLOCK
         );
-    }
-
-    @Override
-    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
-        if (state.get(CHARGED)) {
-            if (random.nextInt(100) == 0) {
-                world.playSound(
-                        null,
-                        (double) pos.getX() + 0.5,
-                        (double) pos.getY() + 0.5,
-                        (double) pos.getZ() + 0.5,
-                        SoundEvents.BLOCK_RESPAWN_ANCHOR_AMBIENT,
-                        SoundCategory.BLOCKS,
-                        1.0F,
-                        1.0F
-                );
-            }
-
-            double d = (double) pos.getX() + 0.5 + (0.5 - random.nextDouble());
-            double e = (double) pos.getY() + 1.0;
-            double f = (double) pos.getZ() + 0.5 + (0.5 - random.nextDouble());
-            double g = (double) random.nextFloat() * 0.04;
-            world.addParticle(ParticleTypes.REVERSE_PORTAL, d, e, f, 0.0, g, 0.0);
-        }
     }
 
     public static int getLuminance(BlockState state) {

@@ -4,9 +4,6 @@ import cloud.viniciusith.endrelay.block.EndRelayBlock;
 import cloud.viniciusith.endrelay.block.entity.EndRelayBlockEntity;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -23,12 +20,9 @@ public class EndRelayMod implements ModInitializer {
     public static final String MOD_ID = "endrelay";
     public static final Logger LOGGER = Logger.getLogger(MOD_ID);
 
-    static final EndRelayBlock END_RELAY_BLOCK = new EndRelayBlock(EndRelayBlock.getBlockProperties());
+    public static final EndRelayBlock END_RELAY_BLOCK = new EndRelayBlock(EndRelayBlock.getBlockProperties());
     public static final BlockEntityType<EndRelayBlockEntity> END_RELAY_BLOCK_ENTITY =
-            FabricBlockEntityTypeBuilder.create(
-                    EndRelayBlockEntity::new,
-                    END_RELAY_BLOCK
-            ).build();
+            EndRelayBlockEntity.getBlockEntityType();
     public static final BlockItem ENDER_RELAY_ITEM = new BlockItem(END_RELAY_BLOCK, new Item.Settings());
 
     @Override
