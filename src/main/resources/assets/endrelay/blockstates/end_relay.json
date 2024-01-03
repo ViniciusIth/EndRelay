@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "charged=false": { "model": "endrelay:block/end_relay" },
+    "charged=true": { "model": "endrelay:block/end_relay_charged" }
+  }
+}

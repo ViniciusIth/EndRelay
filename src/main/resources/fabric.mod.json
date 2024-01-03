@@ -3,8 +3,10 @@
   "id": "endrelay",
   "version": "${version}",
   "name": "End Relay",
-  "description": "",
-  "authors": [],
+  "description": "My opiniated version of the End Relay block from youtuber Kenadian.",
+  "authors": [
+    "Viniciusith"
+  ],
   "contact": {
     "repo": "https://github.com/viniciusith/EndRelay"
   },
@@ -19,9 +21,6 @@
       "cloud.viniciusith.endrelay.EndRelayMod"
     ]
   },
-  "mixins": [
-    "endrelay.mixins.json"
-  ],
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",

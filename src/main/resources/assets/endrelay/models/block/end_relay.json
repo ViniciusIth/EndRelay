@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_bottom_top",
+  "textures": {
+    "bottom": "endrelay:block/relay_bottom",
+    "side": "endrelay:block/relay_side",
+    "top": "endrelay:block/relay_top"
+  }
+}
